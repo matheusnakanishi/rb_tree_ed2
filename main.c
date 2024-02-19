@@ -223,12 +223,13 @@ void arrumarExclusao(Arvore *arvore, No *no) {
                 no->cor = BLACK;
         }
         
-        if ((irmao && irmao->cor == BLACK) && (!(irmao->dir) || irmao->dir->cor == BLACK)) {
+        if ((irmao && irmao->cor == BLACK) && (irmao->dir == NULL || irmao->dir->cor == BLACK)) {
             if (irmao->esq)
                 irmao->esq->cor = BLACK;
             
             irmao->cor = RED;
             rotacaoDir(irmao, arvore);
+            //irmao = no->pai->dir;
         }
 
         if (irmao && (irmao->dir && irmao->dir->cor == RED)) {
@@ -313,6 +314,7 @@ void excluir(Arvore *arvore, Arvore *arvoreAux, int id) {
     // Nó com 1 ou 2 filhos
     else {
         No *suc;
+        Arvore arvoreSuc;
 
         if (aux->esq) {
             suc = aux->esq;
@@ -322,7 +324,7 @@ void excluir(Arvore *arvore, Arvore *arvoreAux, int id) {
 
             aux->id = suc->id;
             suc->id = id;
-            arvoreAux->raiz = aux->esq;
+            arvoreSuc.raiz = aux->esq;
         }
         else {
             suc = aux->dir;
@@ -332,10 +334,10 @@ void excluir(Arvore *arvore, Arvore *arvoreAux, int id) {
 
             aux->id = suc->id;
             suc->id = id;
-            arvoreAux->raiz = aux->dir;
+            arvoreSuc.raiz = aux->dir;
         }
 
-        excluir(arvore, arvoreAux, id);
+        excluir(arvore, &arvoreSuc, id);
     }
 }
 
