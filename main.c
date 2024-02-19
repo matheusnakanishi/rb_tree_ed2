@@ -195,6 +195,152 @@ void exibirArvore(No *raiz){
     }
 }
 
+No *maiorEsquerda(No *no) {
+    while (no->dir)
+        no = no->dir;
+    
+    return no;
+}
+
+void arrumarExclusao(Arvore *arvore, No *no) {
+    No *irmao = NULL;
+    // Nó a esquerda
+    if (no == no->pai->esq) {
+        irmao = no->pai->dir;
+
+        if (irmao && irmao->cor == RED) {
+            no->pai->cor = RED;
+            irmao->cor = BLACK;
+            rotacaoEsq(no->pai, arvore);
+            irmao = no->pai->dir;
+        }
+
+        if ((!irmao || irmao->cor == BLACK) && (!irmao || irmao->esq->cor == BLACK) && (!irmao || irmao->dir->cor == BLACK)) {
+            irmao->cor = RED;
+            no = no->pai;
+
+            if (no->cor == RED)
+                no->cor = BLACK;
+        }
+        
+        if ((irmao && irmao->cor == BLACK) && (!(irmao->dir) || irmao->dir->cor == BLACK)) {
+            if (irmao->esq)
+                irmao->esq->cor = BLACK;
+            
+            irmao->cor = RED;
+            rotacaoDir(irmao, arvore);
+        }
+
+        if (irmao && (irmao->dir && irmao->dir->cor == RED)) {
+            irmao->cor = no->pai->cor;
+            no->pai->cor = BLACK;
+            irmao->dir->cor = BLACK;
+            rotacaoEsq(no->pai, arvore);
+
+            arvore->raiz->cor = BLACK;
+        }
+    }
+    // Nó a direita
+    else {
+        irmao = no->pai->esq;
+
+        if (irmao && irmao->cor == RED) {
+            no->pai->cor = RED;
+            irmao->cor = BLACK;
+            rotacaoDir(no->pai, arvore);
+            irmao = no->pai->esq;
+        }
+
+        if ((!irmao || irmao->cor == BLACK) && (!irmao || irmao->dir->cor == BLACK) && (!irmao || irmao->esq->cor == BLACK)) {
+            irmao->cor = RED;
+            no = no->pai;
+
+            if (no->cor == RED)
+                no->cor = BLACK;
+        }
+        
+        if ((irmao && irmao->cor == BLACK) && (!(irmao->esq) || irmao->esq->cor == BLACK)) {
+            if (irmao->dir)
+                irmao->dir->cor = BLACK;
+            
+            irmao->cor = RED;
+            rotacaoEsq(irmao, arvore);
+        }
+
+        if (irmao && (irmao->esq && irmao->esq->cor == RED)) {
+            irmao->cor = no->pai->cor;
+            no->pai->cor = BLACK;
+            irmao->esq->cor = BLACK;
+            rotacaoDir(no->pai, arvore);
+
+            arvore->raiz->cor = BLACK;
+        }
+    }
+}
+
+
+void excluir(Arvore *arvore, Arvore *arvoreAux, int id) {
+    No *aux = arvoreAux->raiz;
+    // Nó raiz folha
+    if (aux->id == id && aux->esq == NULL && aux->dir == NULL && aux->pai == NULL) {
+        free(aux);
+        arvore->raiz = NULL;
+        return;
+    }
+
+    while (aux && aux->id != id) {
+        if (id < aux->id)   
+            aux = aux->esq;
+        else
+            aux = aux->dir;
+    }
+
+    if (aux == NULL) {
+        printf("\nValor nao encontrado.\n");
+        return;
+    }
+    // Nó folha
+    if (aux->esq == NULL && aux->dir == NULL) {
+        if (aux->cor == BLACK)
+            arrumarExclusao(arvore, aux);
+        
+        if (aux == aux->pai->esq)
+            aux->pai->esq = NULL;
+        else
+            aux->pai->dir = NULL;
+        free(aux);
+    } 
+    // Nó com 1 ou 2 filhos
+    else {
+        No *suc;
+
+        if (aux->esq) {
+            suc = aux->esq;
+
+            while (suc->dir)
+                suc = suc->dir;
+
+            aux->id = suc->id;
+            suc->id = id;
+            arvoreAux->raiz = aux->esq;
+        }
+        else {
+            suc = aux->dir;
+
+            while (suc->esq)
+                suc = suc->esq;
+
+            aux->id = suc->id;
+            suc->id = id;
+            arvoreAux->raiz = aux->dir;
+        }
+
+        excluir(arvore, arvoreAux, id);
+    }
+}
+
+
+
 int main() {
     Arvore arvore;  // Declaração da variável Arvore
     arvore.raiz = NULL;
@@ -203,7 +349,7 @@ int main() {
     int valor;
 
     do {
-        printf("\n[1]Inserir [2]Exibir [0]Sair\nOpcao: ");
+        printf("\n[1]Inserir\n[2]Exibir\n[3]Remover\n[0]Sair\nOpcao: ");
         scanf("%d", &opcao);
 
         switch (opcao) {
@@ -215,6 +361,12 @@ int main() {
 
         case 2:
             exibirArvore(arvore.raiz);
+            break;
+
+        case 3:
+            printf("\nMatricula a ser removida: ");
+            scanf("%d", &valor);
+            excluir(&arvore, &arvore, valor);  
             break;
 
         case 0:
