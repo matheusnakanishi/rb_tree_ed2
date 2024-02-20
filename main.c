@@ -215,7 +215,7 @@ void arrumarExclusao(Arvore *arvore, No *no) {
             irmao = no->pai->dir;
         }
 
-        if ((!irmao || irmao->cor == BLACK) && (!irmao || irmao->esq->cor == BLACK) && (!irmao || irmao->dir->cor == BLACK)) {
+        if ((!irmao || irmao->cor == BLACK) && (!(irmao->esq) || irmao->esq->cor == BLACK) && (!(irmao->dir) || irmao->dir->cor == BLACK)) {
             irmao->cor = RED;
             no = no->pai;
 
@@ -229,7 +229,7 @@ void arrumarExclusao(Arvore *arvore, No *no) {
             
             irmao->cor = RED;
             rotacaoDir(irmao, arvore);
-            //irmao = no->pai->dir;
+            irmao = no->pai->dir;
         }
 
         if (irmao && (irmao->dir && irmao->dir->cor == RED)) {
@@ -252,7 +252,7 @@ void arrumarExclusao(Arvore *arvore, No *no) {
             irmao = no->pai->esq;
         }
 
-        if ((!irmao || irmao->cor == BLACK) && (!irmao || irmao->dir->cor == BLACK) && (!irmao || irmao->esq->cor == BLACK)) {
+        if ((!irmao || irmao->cor == BLACK) && (!(irmao->dir) || irmao->dir->cor == BLACK) && (!(irmao->esq) || irmao->esq->cor == BLACK)) {
             irmao->cor = RED;
             no = no->pai;
 
@@ -266,6 +266,7 @@ void arrumarExclusao(Arvore *arvore, No *no) {
             
             irmao->cor = RED;
             rotacaoEsq(irmao, arvore);
+            irmao = no->pai->esq;
         }
 
         if (irmao && (irmao->esq && irmao->esq->cor == RED)) {
