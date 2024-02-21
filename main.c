@@ -271,7 +271,6 @@ void arrumarExclusao(Arvore *arvore, No *no) {
     }
 }
 
-
 void excluir(Arvore *arvore, Arvore *arvoreAux, int id) {
     No *aux = arvoreAux->raiz;
     // Nó raiz folha
@@ -335,7 +334,7 @@ void excluir(Arvore *arvore, Arvore *arvoreAux, int id) {
 
 int altura(No *raiz) {
     if (!raiz)  
-        return -1;
+        return 0;
 
     int altEsq = 1 + altura(raiz->esq);
     int altDir = 1 + altura(raiz->dir);
@@ -361,16 +360,73 @@ int alturaNegra(No *raiz) {
     return (altEsq > altDir)? altEsq : altDir;
 }
 
+No *buscar(No *raiz, int id, int *comparacoes) {
+    while (raiz && raiz->id != id) {
+        if (id < raiz->id)
+            raiz = raiz->esq;
+        else
+            raiz = raiz->dir;
+
+        *(comparacoes) += 1;
+    }
+    
+    return raiz;
+}
+
+float contadorNN(No *no) {
+    if (!no) 
+        return 1;
+    
+    float cont = 0;
+
+    if (no->cor == BLACK) 
+        cont = 1 + contadorNN(no->esq) + contadorNN(no->dir);
+    else 
+        cont += contadorNN(no->esq) + contadorNN(no->dir);
+    
+    return cont;
+}
+
+float contadorNR(No *no) {
+    if (!no) 
+        return 0;
+    
+    float cont = 0;
+
+    if (no->cor == RED) 
+        cont = 1 + contadorNR(no->esq) + contadorNR(no->dir);
+    else 
+        cont += contadorNR(no->esq) + contadorNR(no->dir);
+    
+    return cont;
+}
+
+void percentagemNos(No *raiz, float *percN, float *percR) {
+    float numNegros = contadorNN(raiz);
+    float numRubros = contadorNR(raiz); 
+    float numNos = numNegros + numRubros;
+
+    *(percN) = (numNegros/numNos)*100.00;
+    *(percR) = (numRubros/numNos)*100.00; 
+}
+
+void liberarArvore(No* raiz) {
+    if (raiz != NULL) {
+        liberarArvore(raiz->esq);
+        liberarArvore(raiz->dir);
+        free(raiz);
+    }
+}
 
 int main() {
     Arvore arvore;  // Declaração da variável Arvore
     arvore.raiz = NULL;
 
-    int opcao;
-    int valor;
+    int opcao, valor, comparacoes;
+    float percN, percR;
 
     do {
-        printf("\n[1]Inserir\n[2]Exibir\n[3]Remover\n[4]Altura\n[0]Sair\nOpcao: ");
+        printf("\n[1]Inserir\n[2]Exibir\n[3]Remover\n[4]Calcular altura\n[5]Buscar matricula\n[6]Calcular porcentagem de cor\n[0]Sair\nOpcao: ");
         scanf("%d", &opcao);
 
         switch (opcao) {
@@ -395,11 +451,30 @@ int main() {
 
         case 4:
             printf("\nAltura da arvore: %d", altura(arvore.raiz));
-            printf("\nAltura Negra da arvore: %d", alturaNegra(arvore.raiz));
+            printf("\nAltura Negra da arvore: %d\n", alturaNegra(arvore.raiz));
+            break;
+
+        case 5:
+            comparacoes = 1;
+            printf("\nMatricula a ser buscada: ");
+            scanf("%d", &valor);
+            No *buscado = buscar(arvore.raiz, valor, &comparacoes);
+            if (buscado)
+                printf("\nMatricula: %d\nCusto da busca: %d\n", buscado->id, comparacoes);
+            else
+                printf("\nMatricula nao encontrada\n");  
+            break;
+
+        case 6:
+            percentagemNos(arvore.raiz, &percN, &percR);
+            printf("\nPorcentagem nos Negros: %.2f%%", percN);
+            printf("\nPorcentagem nos Rubros: %.2f%%\n", percR);
             break;
 
         case 0:
             printf("\nSaindo...\n");
+            liberarArvore(arvore.raiz);
+            arvore.raiz = NULL;
             break;
 
         default:
