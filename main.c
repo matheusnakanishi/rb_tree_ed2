@@ -148,9 +148,7 @@ void arrumarArvore(No *no, Arvore *arvore) {
 void inserir(Arvore *arvore, int id) {
     No* novo = criarNo(id);
     if (novo == NULL)
-    {
         printf("erro memoria");
-    }
     
     No *pai = NULL;
     No *aux = arvore->raiz;
@@ -193,13 +191,6 @@ void exibirArvore(No *raiz){
         exibirArvore(raiz->dir);
         printf(")");
     }
-}
-
-No *maiorEsquerda(No *no) {
-    while (no->dir)
-        no = no->dir;
-    
-    return no;
 }
 
 void arrumarExclusao(Arvore *arvore, No *no) {
@@ -352,6 +343,24 @@ int altura(No *raiz) {
     return (altEsq > altDir)? altEsq : altDir;
 }
 
+int alturaNegra(No *raiz) {
+    if (!raiz) 
+        return 1;
+    
+    int altEsq = 0, altDir = 0;
+
+    if (raiz->cor == BLACK) {
+        altEsq = 1 + alturaNegra(raiz->esq);
+        altDir = 1 + alturaNegra(raiz->dir);
+    }
+    else {
+        altEsq += alturaNegra(raiz->esq);
+        altDir += alturaNegra(raiz->dir);
+    }
+    
+    return (altEsq > altDir)? altEsq : altDir;
+}
+
 
 int main() {
     Arvore arvore;  // Declaração da variável Arvore
@@ -386,6 +395,7 @@ int main() {
 
         case 4:
             printf("\nAltura da arvore: %d", altura(arvore.raiz));
+            printf("\nAltura Negra da arvore: %d", alturaNegra(arvore.raiz));
             break;
 
         case 0:
