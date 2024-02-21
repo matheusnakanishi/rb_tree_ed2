@@ -342,6 +342,15 @@ void excluir(Arvore *arvore, Arvore *arvoreAux, int id) {
     }
 }
 
+int altura(No *raiz) {
+    if (!raiz)  
+        return -1;
+
+    int altEsq = 1 + altura(raiz->esq);
+    int altDir = 1 + altura(raiz->dir);
+    
+    return (altEsq > altDir)? altEsq : altDir;
+}
 
 
 int main() {
@@ -352,14 +361,17 @@ int main() {
     int valor;
 
     do {
-        printf("\n[1]Inserir\n[2]Exibir\n[3]Remover\n[0]Sair\nOpcao: ");
+        printf("\n[1]Inserir\n[2]Exibir\n[3]Remover\n[4]Altura\n[0]Sair\nOpcao: ");
         scanf("%d", &opcao);
 
         switch (opcao) {
         case 1:
             printf("\nMatricula a ser inserido: ");
             scanf("%d", &valor);
-            inserir(&arvore, valor);  
+            if (valor <= 9999)
+                inserir(&arvore, valor);  
+            else
+                printf("\nA matricula deve conter 4 digitos\n");
             break;
 
         case 2:
@@ -370,6 +382,10 @@ int main() {
             printf("\nMatricula a ser removida: ");
             scanf("%d", &valor);
             excluir(&arvore, &arvore, valor);  
+            break;
+
+        case 4:
+            printf("\nAltura da arvore: %d", altura(arvore.raiz));
             break;
 
         case 0:
