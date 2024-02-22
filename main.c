@@ -80,68 +80,80 @@ void arrumarArvore(No *no, Arvore *arvore) {
 
                 // Caso 1E
                 if (tio && tio->cor == RED && no->pai->cor == RED) {
-                    if (avo->cor == RED)
+                    if (avo->cor == RED) {
                         avo->cor = BLACK;
-                    else
+                        printf("Avo fica negro - ");
+                    }
+                    else {
                         avo->cor = RED;
-
+                        printf("Avo fica rubro - ");
+                    }
                     tio->cor = BLACK;
+                    printf("Tio fica negro - ");
                     no->pai->cor = BLACK;
-                
+                    printf("Pai fica negro - ");
+                    
                     arrumarArvore(avo, arvore);
                 }
                 else {
                     // Caso 2E
                     if (no == no->pai->dir && no->pai->cor == RED && (tio == NULL || tio->cor == BLACK)) {
                         no = no->pai;
+                        printf("Rotaciona pai a esquerda - ");
                         rotacaoEsq(no, arvore);
                     }
                     // Caso 3E
                     if (no == no->pai->esq && no->pai->cor == RED && (tio == NULL || tio->cor == BLACK)) {
+                        printf("Rotaciona avo a direita - ");
                         rotacaoDir(avo, arvore);
+                        printf("Avo fica rubro - ");
                         avo->cor = RED;
+                        printf("Pai fica negro - ");
                         no->pai->cor = BLACK;
                     }
                 }
             }
             // Pai a direita
             else {
-                printf("atribuicao tio");
                 No *tio = avo->esq;
-
                 // Caso 1D
                 if (tio && tio->cor == RED && no->pai->cor == RED) {
-                    if (avo->cor == RED)
+                    if (avo->cor == RED) {
                         avo->cor = BLACK;
-                    else
+                        printf("Avo fica negro - ");
+                    }
+                    else {
                         avo->cor = RED;
-
+                        printf("Avo fica rubro - ");
+                    }
                     tio->cor = BLACK;
+                    printf("Tio fica negro - ");
                     no->pai->cor = BLACK;
+                    printf("Pai fica negro - ");
                 
                     arrumarArvore(avo, arvore);
                 }
                 else {
                     // Caso 2D
-                    printf("1");
                     if (no == no->pai->esq && no->pai->cor == RED && (tio == NULL || tio->cor == BLACK)) {
                         no = no->pai;
-                        printf("2d");
                         rotacaoDir(no, arvore);
-                        printf("rd");
+                        printf("Rotaciona pai a direita - ");
                     }
                     // Caso 3D
                     if (no == no->pai->dir && no->pai->cor == RED && (tio == NULL || tio->cor == BLACK)) {
-                        printf("3d");
                         rotacaoEsq(avo, arvore);
-                        printf("re");
+                        printf("Rotaciona avo a esquerda - ");
                         avo->cor = RED;
+                        printf("Avo fica rubro - ");
                         no->pai->cor = BLACK;
+                        printf("Pai fica negro - ");
                     }
                 }
             }
         }
     arvore->raiz->cor = BLACK;
+    printf("Raiz fica negra - ");
     }
 }
 
@@ -193,6 +205,51 @@ void exibirArvore(No *raiz){
     }
 }
 
+void caso32(No *no, int lado) {
+    if (no && no->pai)
+    {
+    
+        if (lado == 0) {
+            No *irmao = no->pai->dir;
+            
+            if ((!irmao || irmao->cor == BLACK) && (!(irmao->esq) || irmao->esq->cor == BLACK) && (!(irmao->dir) || irmao->dir->cor == BLACK)) {
+                if (irmao) {
+                    irmao->cor = RED;
+                    printf("Irmao fica rubro - ");
+                }
+                
+                no = no->pai;
+                printf("No aponta para o pai - ");
+                if ((no->cor == RED)) {
+                    no->cor = BLACK;
+                    printf("No fica negro - ");
+                }
+                caso32(no, 0);
+            }
+        }
+        else {
+            No *irmao = no->pai->esq;
+
+            if ((!irmao || irmao->cor == BLACK) && (!(irmao->dir) || irmao->dir->cor == BLACK) && (!(irmao->esq) || irmao->esq->cor == BLACK)) {
+                if (irmao) {
+                    irmao->cor = RED;
+                    printf("Irmao fica rubro - ");
+                }
+                
+                no = no->pai;
+                printf("No aponta pro pai - ");
+
+                if ((no->cor == RED)) {
+                    no->cor = BLACK;
+                    printf("No fica negro - ");
+                }
+
+                caso32(no, 1);
+            }
+        }
+    }
+}
+
 void arrumarExclusao(Arvore *arvore, No *no) {
     No *irmao = NULL;
     // Nó a esquerda
@@ -201,35 +258,43 @@ void arrumarExclusao(Arvore *arvore, No *no) {
 
         if (irmao && irmao->cor == RED) {
             no->pai->cor = RED;
+            printf("Pai fica rubro - ");
             irmao->cor = BLACK;
+            printf("Irmao fica negro - ");
             rotacaoEsq(no->pai, arvore);
+            printf("Rotaciona pai a esquerda - ");
             irmao = no->pai->dir;
+            printf("Atualiza irmao - ");
         }
 
-        if ((!irmao || irmao->cor == BLACK) && (!(irmao->esq) || irmao->esq->cor == BLACK) && (!(irmao->dir) || irmao->dir->cor == BLACK)) {
-            irmao->cor = RED;
-            no = no->pai;
-
-            if (no->cor == RED)
-                no->cor = BLACK;
-        }
+        caso32(no, 0);
         
         if ((irmao && irmao->cor == BLACK) && (irmao->dir == NULL || irmao->dir->cor == BLACK)) {
-            if (irmao->esq)
+            if (irmao->esq) {
                 irmao->esq->cor = BLACK;
+                printf("Filho esquerdo do irmao fica negro - ");
+            }
             
             irmao->cor = RED;
+            printf("Irmao fica rubro - ");
             rotacaoDir(irmao, arvore);
+            printf("Rotaciona irmao a direita - ");
             irmao = no->pai->dir;
+            printf("Atualiza irmao - ");
         }
 
         if (irmao && (irmao->dir && irmao->dir->cor == RED)) {
             irmao->cor = no->pai->cor;
+            printf("Irmao copia a cor do pai - ");
             no->pai->cor = BLACK;
+            printf("Pai fica negro - ");
             irmao->dir->cor = BLACK;
+            printf("Filho direito do irmao fica negro - ");
             rotacaoEsq(no->pai, arvore);
+            printf("Rotaciona pai a esquerda - ");
 
             arvore->raiz->cor = BLACK;
+            printf("Raiz fica negra - ");
         }
     }
     // Nó a direita
@@ -238,35 +303,43 @@ void arrumarExclusao(Arvore *arvore, No *no) {
 
         if (irmao && irmao->cor == RED) {
             no->pai->cor = RED;
+            printf("Pai fica rubro - ");
             irmao->cor = BLACK;
+            printf("Irmao fica negro - ");
             rotacaoDir(no->pai, arvore);
+            printf("Rotaciona pai a direita - ");
             irmao = no->pai->esq;
+            printf("Atualiza irmao - ");
         }
 
-        if ((!irmao || irmao->cor == BLACK) && (!(irmao->dir) || irmao->dir->cor == BLACK) && (!(irmao->esq) || irmao->esq->cor == BLACK)) {
-            irmao->cor = RED;
-            no = no->pai;
-
-            if (no->cor == RED)
-                no->cor = BLACK;
-        }
+        caso32(no, 1);
         
         if ((irmao && irmao->cor == BLACK) && (!(irmao->esq) || irmao->esq->cor == BLACK)) {
-            if (irmao->dir)
+            if (irmao->dir) {
                 irmao->dir->cor = BLACK;
+                printf("Irmao a direita fica negro - ");
+            }
             
             irmao->cor = RED;
+            printf("Irmao fica rubro - ");
             rotacaoEsq(irmao, arvore);
+            printf("Rotaciona irma a esquerda - ");
             irmao = no->pai->esq;
+            printf("Atualiza irmao - ");
         }
 
         if (irmao && (irmao->esq && irmao->esq->cor == RED)) {
             irmao->cor = no->pai->cor;
+            printf("Irmao copia cor do pai - ");
             no->pai->cor = BLACK;
+            printf("Pai fica negro - ");
             irmao->esq->cor = BLACK;
+            printf("Filho a esquerda do irmao fica negro - ");
             rotacaoDir(no->pai, arvore);
+            printf("Rotaciona pai a direita - ");
 
             arvore->raiz->cor = BLACK;
+            printf("Raiz fica negra - ");
         }
     }
 }
@@ -298,7 +371,7 @@ void excluir(Arvore *arvore, Arvore *arvoreAux, int id) {
         
         if (aux == aux->pai->esq)
             aux->pai->esq = NULL;
-        else
+        if(aux == aux->pai->dir)
             aux->pai->dir = NULL;
         free(aux);
     } 
