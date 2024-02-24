@@ -399,7 +399,7 @@ No *buscar(No *raiz, int id, int *comparacoes) {
 
 float contadorNN(No *no) {
     if (!no) 
-        return 1;
+        return 0;
     
     float cont = 0;
 
